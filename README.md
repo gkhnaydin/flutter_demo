@@ -1,3 +1,5 @@
+cmd>flutter create ornek_proje --org com.sirketadi --platform=android
+
 # birlesmisprojeler
 
 A new Flutter project.
