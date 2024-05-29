@@ -1,4 +1,6 @@
 cmd>flutter create ornek_proje --org com.sirketadi --platform=android
+cmd>cd ornek_proje
+cmd>flutter run
 
 # birlesmisprojeler
 
