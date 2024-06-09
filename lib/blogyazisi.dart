@@ -1,35 +1,23 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:birlesmisprojeler/anasayfa.dart';
 
-class firebaseconnect extends StatelessWidget {
+class Blogyazisi extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Firebase Connect Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: const Iskelet(title: 'Firebase Connect Demo Home Page'),
-    );
-  }
+  State<Blogyazisi> createState() => _MyHomePageState();
 }
 
-class Iskelet extends StatefulWidget {
-  const Iskelet({super.key, required this.title});
-  final String title;
-
-  @override
-  State<Iskelet> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<Iskelet> {
+class _MyHomePageState extends State<Blogyazisi> {
   TextEditingController nameInput = TextEditingController();
   TextEditingController surnameInput = TextEditingController();
   TextEditingController ageInput = TextEditingController();
   TextEditingController birthdateInput = TextEditingController();
   String name = "", surname = "", age = "", birthdate = "";
+
+  FirebaseAuth auth = FirebaseAuth.instance;
 
   add() {
     setState(() {
@@ -39,12 +27,14 @@ class _MyHomePageState extends State<Iskelet> {
       birthdate = birthdateInput.text;
 
       FirebaseFirestore.instance.collection("Yazilar").doc(name).set({
+        'useruid': auth.currentUser!.uid,
         'name': name,
         'surname': surname,
         'age': age,
         'birthdate': birthdate
       }).whenComplete(() => print('veri firabase yazildi.'));
     });
+    clearInput();
   }
 
   update() {
@@ -55,12 +45,14 @@ class _MyHomePageState extends State<Iskelet> {
       birthdate = birthdateInput.text;
 
       FirebaseFirestore.instance.collection("Yazilar").doc(name).update({
+        'useruid': auth.currentUser!.uid,
         'name': name,
         'surname': surname,
         'age': age,
         'birthdate': birthdate
       }).whenComplete(() => print('veri firabase güncellendi.'));
     });
+    clearInput();
   }
 
   delete() {
@@ -72,26 +64,24 @@ class _MyHomePageState extends State<Iskelet> {
 
       FirebaseFirestore.instance.collection("Yazilar").doc(name).delete();
     });
+    clearInput();
   }
 
-  dataCall() {
-    name = nameInput.text;
-    FirebaseFirestore.instance
-        .collection("Yazilar")
-        .doc(name)
-        .get()
-        .then((value) {
-      setState(() {
-        name = value.data()!["name"];
-        surname = value.data()!["name"] +
-            "-" +
-            value.data()!["surname"] +
-            "-" +
-            value.data()!["age"] +
-            "-" +
-            value.data()!["birthdate"];
-      });
-    });
+  getListUsers() {
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+          builder: (context) => Anasayfa(),
+        ),
+        (route) => true); //appbar varsa geri otomatik olarak geri btn koyar.
+    clearInput();
+  }
+
+  clearInput() {
+    nameInput.clear();
+    surnameInput.clear();
+    ageInput.clear();
+    birthdateInput.clear();
   }
 
   @override
@@ -99,7 +89,7 @@ class _MyHomePageState extends State<Iskelet> {
     return Scaffold(
         appBar: AppBar(
           backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-          title: Text(widget.title),
+          title: Text("Profil Sayfası"),
         ),
         body: Container(
           margin: EdgeInsets.all(75),
@@ -132,7 +122,8 @@ class _MyHomePageState extends State<Iskelet> {
                     ElevatedButton(onPressed: add, child: Text('Add')),
                     ElevatedButton(onPressed: update, child: Text('Update')),
                     ElevatedButton(onPressed: delete, child: Text('Delete')),
-                    ElevatedButton(onPressed: dataCall, child: Text('Getir')),
+                    ElevatedButton(
+                        onPressed: getListUsers, child: Text('Getir')),
                   ],
                 ),
                 ListTile(

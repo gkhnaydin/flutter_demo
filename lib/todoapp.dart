@@ -78,10 +78,38 @@ class AnaEkranState extends State<AnaEkran> {
                   itemCount: alisverisList.length,
                   itemBuilder: (context, index) {
                     return ListTile(
-                        subtitle: Text("Alis veris listesi"),
-                        title: Text(alisverisList[index]),
-                        hoverColor: Color.fromARGB(24, 112, 114, 4));
+                      subtitle: Text("Alis veris listesi"),
+                      title: Text(alisverisList[index]),
+                      hoverColor: Color.fromARGB(24, 112, 114, 4),
+                      trailing: const Icon(Icons.chevron_right),
+                      leading: const Icon(Icons.chevron_left),
+                      tileColor: Colors.amberAccent,
+                      onTap: () {
+                        print("tıklandı.");
+                      },
+                    );
                   }),
+            ),
+            Flexible(
+              child: ListView.separated(
+                itemCount: alisverisList.length,
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    subtitle: Text("Alis veris listesi"),
+                    title: Text(alisverisList[index]),
+                    hoverColor: Color.fromARGB(24, 112, 114, 4),
+                    trailing: const Icon(Icons.chevron_right),
+                    leading: const Icon(Icons.chevron_left),
+                    tileColor: Colors.grey.shade50,
+                    onTap: () {
+                      print("tıklandı.");
+                    },
+                  );
+                },
+                separatorBuilder: (context, index) {
+                  return Divider();
+                },
+              ),
             ),
             TextField(
               controller: inputContr,
