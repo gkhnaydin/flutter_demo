@@ -1,6 +1,8 @@
 import 'dart:collection';
 
 import 'package:bilgi_testi/constants.dart';
+import 'package:bilgi_testi/soru.dart';
+import 'package:bilgi_testi/test_veri.dart';
 import 'package:flutter/material.dart';
 
 void main() => runApp(BilgiTesti());
@@ -26,50 +28,76 @@ class SoruSayfasi extends StatefulWidget {
 
 class _SoruSayfasiState extends State<SoruSayfasi> {
   List<Widget> secimler = [];
-  List<String> sorular = [
-    'Titanic gelmiş geçmiş en büyük gemidir',
-    'Dünyadaki tavuk sayısı insan sayısından fazladır',
-    'Kelebeklerin ömrü bir gündür',
-    'Dünya düzdür',
-    'Kaju fıstığı aslında bir meyvenin sapıdır',
-    'Fatih Sultan Mehmet hiç patates yememiştir',
-    'Fransızlar 80 demek için, 4 * 20 der'
-  ];
-
-  List<bool> cevaplar = [false, true, false, false, true, true, true];
-
-  int soruIndex = 0;
+  TestVeri testVeri = TestVeri();
 
   addFail() {
     setState(() {
-      if (cevaplar[soruIndex] == false) {
+      if (testVeri.getSoruYaniti() == false) {
         secimler.add(dogruIcon);
       } else {
         secimler.add(yanlisIcon);
       }
 
-      if (soruIndex == 6) {
-        soruIndex = 0;
-        secimler.clear();
+      if (testVeri.getSoruIndex() == (testVeri.getSoruBoyut() - 1)) {
+        _showMyDialog();
+      } else {
+        testVeri.sonrakiSoru();
       }
-      soruIndex++;
     });
   }
 
   addSucces() {
     setState(() {
-      if (cevaplar[soruIndex] == true) {
+      if (testVeri.getSoruYaniti() == true) {
         secimler.add(dogruIcon);
       } else {
         secimler.add(yanlisIcon);
       }
 
-      if (soruIndex == 6) {
-        soruIndex = 0;
-        secimler.clear();
+      if (testVeri.getSoruIndex() == (testVeri.getSoruBoyut() - 1)) {
+        _showMyDialog();
+      } else {
+        testVeri.sonrakiSoru();
       }
-      soruIndex++;
     });
+  }
+
+  Future<void> _showMyDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('BRAVO TESTİ BİTİRDİNİZ'),
+          content: const SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('Son soruya geldiniz!'),
+                Text('Tekrar başa dönmek istiyor musunuz?'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Hayır'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Evet'),
+              onPressed: () {
+                setState(() {
+                  testVeri.indexClear();
+                  secimler.clear();
+                });
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -84,7 +112,7 @@ class _SoruSayfasiState extends State<SoruSayfasi> {
             padding: EdgeInsets.all(10.0),
             child: Center(
               child: Text(
-                sorular[soruIndex],
+                testVeri.getSoruMetni(),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 20.0,
